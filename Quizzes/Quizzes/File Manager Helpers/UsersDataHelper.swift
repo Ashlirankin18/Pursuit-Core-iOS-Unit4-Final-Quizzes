@@ -11,7 +11,7 @@ final class PersistanceHelper{
   private static let filename = "UserInfo.plist"
   private static var books = [UserModel]()
   
-  static func getFavBooks() ->[UserModel]{
+  static func getUserInfo() ->[UserModel]{
     let path = DataPersistenceManager.filepathToDocumentsDiretory(filename: filename).path
     if FileManager.default.fileExists(atPath: path){
       if let data = FileManager.default.contents(atPath: path){

@@ -8,6 +8,7 @@
 
 import UIKit
 import AVFoundation
+import QuartzCore
 
 class ProfileViewController: UIViewController {
 
@@ -17,26 +18,40 @@ class ProfileViewController: UIViewController {
   var imagePickerController: UIImagePickerController!
   var tapGesture = UITapGestureRecognizer()
   var errorAlertController: UIAlertController!
+  
   var chosenUserName = "" {
     didSet{
       self.userNameButton.setTitle("@ \(chosenUserName)", for: .normal)
     }
   }
+  var currentIndex = 0
+  var didFinishProfileSetUp = Bool()
   
   override func viewDidLoad() {
         super.viewDidLoad()
-    setUpAlertController(title: "Enter your username", message: "Please enter a username that does not contain any special characthers or numbers ")
+    
     userImage.addGestureRecognizer(addTapGesture())
     setUpImagePickerController()
+    didFinishProfileSetUp = false
+    signUporSignedIn()
+    rounderImages()
     }
-  
-  private func setUpErrorAlerts(title:String,message:String){
+  private func rounderImages(){
+    userImage.layer.cornerRadius = 200
+    userImage.clipsToBounds = true
+    userImage.layer.masksToBounds = true
+    userImage.layer.borderWidth = 6
+    userImage.layer.borderColor = UIColor.white.cgColor
+   
+  }
+  private func setUpAlerts(title:String,message:String){
     errorAlertController = UIAlertController()
     errorAlertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
     let okAction = UIAlertAction(title: "Ok", style: .default)
     errorAlertController.addAction(okAction)
-    self.present(alertController, animated: true, completion: nil)
+    self.present(errorAlertController, animated: true, completion: nil)
   }
+
   private func setUpImagePickerController(){
     imagePickerController = UIImagePickerController()
     imagePickerController.delegate = self
@@ -81,14 +96,26 @@ class ProfileViewController: UIViewController {
     self.present(alertController, animated: true, completion: nil)
   }
   
-  func signUporSignedIn(usersDatabase:[UserModel]){
-    if usersDatabase.isEmpty {
-      self.present(alertController, animated: true, completion: nil)
+  func signUporSignedIn(){
+    if PersistanceHelper.getUserInfo().isEmpty {
+      setUpAlertController(title: "Enter your username", message: "Please enter a username that does not contain any special characthers or numbers ")
     }else{
-      
+      let user = PersistanceHelper.getUserInfo()[currentIndex]
+      if let data = user.imageData {
+        self.userImage.image = UIImage(data: data)
+      }
+      self.userNameButton.setTitle(user.userName, for: .normal)
+      setUpAlerts(title: "Welcome", message: "Welcome back \(user.userName)")
+      print("I have \(PersistanceHelper.getUserInfo().count) items")
     }
   }
-  private func didFinishProfileSetUp(){}
+  private func getImageData(image:UIImage,userName:String){
+    let data = image.jpegData(compressionQuality: 0.5)
+    let id = UUID().uuidString
+    let user = UserModel.init(id: id, userName: userName, imageData: data)
+    PersistanceHelper.addItemsToDirectory(entry: user)
+    setUpAlerts(title: "Sign Up complete!", message: "Thank you \(userName) for signing up")
+  }
 
 }
 extension ProfileViewController:UIImagePickerControllerDelegate,UINavigationControllerDelegate{
@@ -97,9 +124,13 @@ extension ProfileViewController:UIImagePickerControllerDelegate,UINavigationCont
   }
   func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
     if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-      userImage.image = image
+      
+      if let username = self.userNameButton.currentTitle{
+        userImage.image = image
+        getImageData(image: image, userName: username)
+      }
     }else {
-      self.setUpErrorAlerts(title: "No images we found", message: "Please make sure you have image in for photo library")
+      self.setUpAlerts(title: "No images we found", message: "Please make sure you have image in for photo library")
     }
     dismiss(animated: true, completion: nil)
   }
