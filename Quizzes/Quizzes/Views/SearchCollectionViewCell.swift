@@ -1,5 +1,5 @@
 //
-//  quizCollectionViewCell.swift
+//  SearchCollectionViewCell.swift
 //  Quizzes
 //
 //  Created by Ashli Rankin on 2/1/19.
@@ -7,30 +7,30 @@
 //
 
 import UIKit
-protocol QuizCollectionViewCellDelegate:AnyObject {
-  func presentActionsheet(alertController:UIAlertController)
-  func removeFlashCard(index:Int)
-}
 
-class QuizCollectionViewCell: UICollectionViewCell {
-  weak var delegate: QuizCollectionViewCellDelegate?
+protocol SearchCollectionViewDelegate: AnyObject{
+  func addToAllQuizes(index:Int)
+}
+class SearchCollectionViewCell: UICollectionViewCell {
+  weak var delegate: SearchCollectionViewDelegate?
   
   lazy var titleLabel:UILabel = {
     let label = UILabel()
     label.text = "Title"
     label.textColor = .black
     label.backgroundColor = .clear
-    label.font = UIFont(name: "Times", size: 15)
+    label.font = UIFont(name: "Times", size: 24)
     label.textAlignment = .center
     label.numberOfLines = 0
+    
     return label
   }()
   
   lazy var addButton:UIButton = {
     let button = UIButton()
     button.backgroundColor = .clear
-    button.setImage(#imageLiteral(resourceName: "more-filled.png"), for: .normal)
-    button.addTarget(self, action: #selector(presentOptions), for: .touchUpInside)
+    button.setImage(#imageLiteral(resourceName: "add-icon-filled.png"), for: .normal)
+    button.addTarget(self, action: #selector (addToQuizzes), for: .touchUpInside)
     return button
   }()
   
@@ -40,45 +40,38 @@ class QuizCollectionViewCell: UICollectionViewCell {
   }
   
   required init?(coder aDecoder: NSCoder) {
-   super.init(coder: aDecoder)
+    super.init(coder: aDecoder)
     commonInit()
   }
   
-  func commonInit(){
+  private func commonInit(){
     setUpViews()
     layer.borderWidth = 4
   }
- @objc private func presentOptions(){
-  
-  let alertController = UIAlertController(title: "Options", message: "What would like to do?", preferredStyle: .actionSheet)
-  
-  let deleteAction = UIAlertAction(title: "Delete", style: .destructive) { (delete) in
-   self.delegate?.removeFlashCard(index: self.addButton.tag)
+  @objc func addToQuizzes(){
+    delegate?.addToAllQuizes(index: addButton.tag)
+    
   }
-  alertController.addAction(deleteAction)
-  delegate?.presentActionsheet(alertController: alertController)
-  }
-  
 }
-extension QuizCollectionViewCell{
-  func setUpViews(){
+extension SearchCollectionViewCell{
+  private func setUpViews(){
     setUpbuttonConstraints()
     setupLabelConstraints()
   }
-  func setupLabelConstraints(){
+  private func setupLabelConstraints(){
     addSubview(titleLabel)
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
     NSLayoutConstraint.init(item: titleLabel, attribute: .leading, relatedBy: .equal, toItem: safeAreaLayoutGuide, attribute: .leading, multiplier: 1.0, constant: 0).isActive = true
     NSLayoutConstraint.init(item: titleLabel, attribute: .trailing, relatedBy: .equal, toItem: safeAreaLayoutGuide, attribute: .trailing, multiplier: 1.0, constant: 0).isActive = true
     NSLayoutConstraint.init(item: titleLabel, attribute: .centerY, relatedBy: .equal, toItem: safeAreaLayoutGuide, attribute: .centerY, multiplier: 1.0, constant: 0).isActive = true
   }
-  func setUpbuttonConstraints(){
+ private func setUpbuttonConstraints(){
     addSubview(addButton)
     addButton.translatesAutoresizingMaskIntoConstraints = false
     NSLayoutConstraint.init(item: addButton, attribute: .top, relatedBy: .equal, toItem: safeAreaLayoutGuide, attribute: .top, multiplier: 1.0, constant: 0).isActive = true
     NSLayoutConstraint.init(item: addButton, attribute: .trailing, relatedBy: .equal, toItem: safeAreaLayoutGuide, attribute: .trailing, multiplier: 1.0, constant: 0).isActive = true
-    NSLayoutConstraint.init(item: addButton, attribute: .height
-      , relatedBy: .equal, toItem: safeAreaLayoutGuide, attribute: .height, multiplier: 0.0, constant: 44).isActive = true
-    NSLayoutConstraint.init(item: addButton, attribute: .width, relatedBy: .equal, toItem: safeAreaLayoutGuide, attribute: .width, multiplier: 0, constant: 44).isActive = true
+  NSLayoutConstraint.init(item: addButton, attribute: .height
+    , relatedBy: .equal, toItem: safeAreaLayoutGuide, attribute: .height, multiplier: 0.0, constant: 44).isActive = true
+  NSLayoutConstraint.init(item: addButton, attribute: .width, relatedBy: .equal, toItem: safeAreaLayoutGuide, attribute: .width, multiplier: 0, constant: 44).isActive = true
   }
 }

@@ -12,7 +12,7 @@ import QuartzCore
 
 class ProfileViewController: UIViewController {
 
-  @IBOutlet weak var userImage: UIImageView!
+  //@IBOutlet weak var userImage: UIImageView!
   @IBOutlet weak var userNameButton: UIButton!
   var alertController: UIAlertController!
   var imagePickerController: UIImagePickerController!
@@ -30,18 +30,23 @@ class ProfileViewController: UIViewController {
   override func viewDidLoad() {
         super.viewDidLoad()
     
-    userImage.addGestureRecognizer(addTapGesture())
+    //userImage.addGestureRecognizer(addTapGesture())
     setUpImagePickerController()
     didFinishProfileSetUp = false
     signUporSignedIn()
-    rounderImages()
+    //rounderImages()
     }
+  
+  override func viewWillLayoutSubviews() {
+    super.viewWillLayoutSubviews()
+    rounderImages()
+  }
   private func rounderImages(){
-    userImage.layer.cornerRadius = 200
-    userImage.clipsToBounds = true
-    userImage.layer.masksToBounds = true
-    userImage.layer.borderWidth = 6
-    userImage.layer.borderColor = UIColor.white.cgColor
+    userNameButton.layer.cornerRadius = userNameButton.bounds.width/2
+    userNameButton.clipsToBounds = true
+//    userImage.layer.masksToBounds = true
+//    userImage.layer.borderWidth = 6
+//    userImage.layer.borderColor = UIColor.white.cgColor
    
   }
   private func setUpAlerts(title:String,message:String){
@@ -102,7 +107,8 @@ class ProfileViewController: UIViewController {
     }else{
       let user = PersistanceHelper.getUserInfo()[currentIndex]
       if let data = user.imageData {
-        self.userImage.image = UIImage(data: data)
+        // TODO: background thread for UIIMage(data: data)
+        self.userNameButton.setImage(UIImage(data: data), for: .normal)
       }
       self.userNameButton.setTitle(user.userName, for: .normal)
       setUpAlerts(title: "Welcome", message: "Welcome back \(user.userName)")
@@ -126,7 +132,8 @@ extension ProfileViewController:UIImagePickerControllerDelegate,UINavigationCont
     if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
       
       if let username = self.userNameButton.currentTitle{
-        userImage.image = image
+        //userImage.image = image
+        userNameButton.setImage(image, for: .normal)
         getImageData(image: image, userName: username)
       }
     }else {

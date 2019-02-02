@@ -12,6 +12,6 @@ struct QuizData:Codable {
 }
 struct Quizzes:Codable {
   let id: String
-  let quizTile:String
+  let quizTitle:String
   let facts: [String]
 }
