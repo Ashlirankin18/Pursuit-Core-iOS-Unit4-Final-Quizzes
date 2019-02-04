@@ -8,12 +8,13 @@
 
 import UIKit
 import AVFoundation
-import QuartzCore
 
 class ProfileViewController: UIViewController {
 
-  //@IBOutlet weak var userImage: UIImageView!
   @IBOutlet weak var userNameButton: UIButton!
+  
+  @IBOutlet weak var profilePictureButton: UIButton!
+  
   var alertController: UIAlertController!
   var imagePickerController: UIImagePickerController!
   var tapGesture = UITapGestureRecognizer()
@@ -21,7 +22,7 @@ class ProfileViewController: UIViewController {
   
   var chosenUserName = "" {
     didSet{
-      self.userNameButton.setTitle("@ \(chosenUserName)", for: .normal)
+      self.userNameButton.setTitle("@\(chosenUserName)", for: .normal)
     }
   }
   var currentIndex = 0
@@ -30,25 +31,32 @@ class ProfileViewController: UIViewController {
   override func viewDidLoad() {
         super.viewDidLoad()
     
-    //userImage.addGestureRecognizer(addTapGesture())
+   
     setUpImagePickerController()
     didFinishProfileSetUp = false
     signUporSignedIn()
-    //rounderImages()
-    }
-  
-  override func viewWillLayoutSubviews() {
-    super.viewWillLayoutSubviews()
     rounderImages()
-  }
+    print(PersistanceHelper.getUserInfo())
+    }
+    
+  
   private func rounderImages(){
-    userNameButton.layer.cornerRadius = userNameButton.bounds.width/2
-    userNameButton.clipsToBounds = true
-//    userImage.layer.masksToBounds = true
-//    userImage.layer.borderWidth = 6
-//    userImage.layer.borderColor = UIColor.white.cgColor
-   
+   profilePictureButton.layer.cornerRadius = userNameButton.bounds.width/2
+    profilePictureButton.clipsToBounds = true
   }
+  @IBAction func profileImagePressed(_ sender: UIButton) {
+    imagePickerController.sourceType = .photoLibrary
+     showimagePickerController()
+  }
+  
+  @IBAction func userNamePressed(_ sender: UIButton) {
+    if sender.isTouchInside {
+      self.setUpAlertController(title: "Welcome!", message: "Create a new flashCard Username")
+      currentIndex += 1
+    }
+  }
+  
+  
   private func setUpAlerts(title:String,message:String){
     errorAlertController = UIAlertController()
     errorAlertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
@@ -66,20 +74,7 @@ class ProfileViewController: UIViewController {
   private func showimagePickerController(){
     self.present(imagePickerController, animated: true, completion: nil)
   }
-  
-  private func addTapGesture() -> UITapGestureRecognizer {
-    tapGesture.addTarget(self, action: #selector(setImage))
-    tapGesture.numberOfTapsRequired = 1
-    return tapGesture
-  }
-  
-  @objc func setImage(){
-    imagePickerController.sourceType = .photoLibrary
-    showimagePickerController()
-  }
-  
-  
-  
+ 
   
   private func setUpAlertController(title:String,message:String){
     alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
@@ -88,8 +83,8 @@ class ProfileViewController: UIViewController {
       guard let userName = self.alertController.textFields?.first?.text else {
         print("No text was found")
         return}
-        self.chosenUserName = userName
-      
+      self.chosenUserName = userName
+    
     }
     
     alertController.addTextField { (createTextfield) in
@@ -107,13 +102,14 @@ class ProfileViewController: UIViewController {
     }else{
       let user = PersistanceHelper.getUserInfo()[currentIndex]
       if let data = user.imageData {
-        // TODO: background thread for UIIMage(data: data)
-        self.userNameButton.setImage(UIImage(data: data), for: .normal)
+        
+        self.profilePictureButton.setImage(UIImage(data: data), for: .normal)
       }
       self.userNameButton.setTitle(user.userName, for: .normal)
       setUpAlerts(title: "Welcome", message: "Welcome back \(user.userName)")
-      print("I have \(PersistanceHelper.getUserInfo().count) items")
+   
     }
+    
   }
   private func getImageData(image:UIImage,userName:String){
     let data = image.jpegData(compressionQuality: 0.5)
@@ -130,14 +126,12 @@ extension ProfileViewController:UIImagePickerControllerDelegate,UINavigationCont
   }
   func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
     if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-      
       if let username = self.userNameButton.currentTitle{
-        //userImage.image = image
-        userNameButton.setImage(image, for: .normal)
+        profilePictureButton.setImage(image, for: .normal)
         getImageData(image: image, userName: username)
       }
     }else {
-      self.setUpAlerts(title: "No images we found", message: "Please make sure you have image in for photo library")
+      self.setUpAlerts(title: "No images found", message: "Please make sure you have image in for photo library")
     }
     dismiss(animated: true, completion: nil)
   }

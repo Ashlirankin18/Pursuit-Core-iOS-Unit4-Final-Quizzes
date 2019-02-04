@@ -12,16 +12,16 @@ class QuizzViewController: UIViewController {
 
   @IBOutlet var quizView: QuizzView!
   
-  
-  
     override func viewDidLoad() {
         super.viewDidLoad()
       quizView.quizCollectionView.dataSource = self
       quizView.quizCollectionView.delegate = self
       
     }
+  
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(true)
+    quizView.reloadInputViews()
     self.quizView.quizCollectionView.reloadData()
   }
 
@@ -31,6 +31,7 @@ extension QuizzViewController:UICollectionViewDelegateFlowLayout{
     return CGSize.init(width: 400, height: 300)
   }
 }
+
 extension QuizzViewController:UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     print(OnlineQuizHelper.getQuizes().count)
@@ -51,7 +52,6 @@ extension QuizzViewController:UICollectionViewDataSource {
     let detailledView = QuizDetailledView()
     let detailledViewController = QuizzDetailledViewController.init(flashCard: flashCard, view: detailledView)
     
-    
     self.navigationController?.pushViewController(detailledViewController, animated: true)
   }
   
@@ -66,6 +66,4 @@ extension QuizzViewController:QuizCollectionViewCellDelegate{
   func presentActionsheet(alertController: UIAlertController) {
     self.present(alertController, animated: true, completion: nil)
   }
-  
-  
 }

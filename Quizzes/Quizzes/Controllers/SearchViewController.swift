@@ -26,6 +26,7 @@ class SearchViewController: UIViewController {
         super.viewDidLoad()
       searchView.searchCollectionView.dataSource = self
       searchView.searchCollectionView.delegate = self
+      searchView.searchBar.delegate = self
       getOnlineQuizes()
      
     }
@@ -49,6 +50,7 @@ class SearchViewController: UIViewController {
     self.present(errorAlertController, animated: true, completion: nil)
   }
 }
+
 extension SearchViewController:UICollectionViewDelegateFlowLayout{
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
     return CGSize.init(width: 400, height: 300)
@@ -72,11 +74,33 @@ extension SearchViewController:UICollectionViewDataSource{
 extension SearchViewController:SearchCollectionViewDelegate{
   func addToAllQuizes(index: Int) {
     let flashcard = onlineQuizes[index]
+    if OnlineQuizHelper.getQuizes().contains(where: { (quiz) -> Bool in
+      quiz.id == flashcard.id
+    }){
+      setUpAlerts(title: "Duplicate Quiz", message: "Quiz is already in your collection")
+    }else{
     OnlineQuizHelper.addItemsToDirectory(quiz: flashcard)
     self.setUpAlerts(title: "FLASHCARD ADDED", message: "Your Flashcard was sucessfully added")
+    tabBarController?.selectedViewController = tabBarController?.viewControllers![0]
   }
-  
-  
-  
+  }
+}
+extension SearchViewController:UISearchBarDelegate{
+  func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+    if searchBar.text!.isEmpty{
+      getOnlineQuizes()
+    }
+    else if let text = searchBar.text {
+      let searchResults = onlineQuizes.filter{$0.quizTitle.contains(text)}
+      if searchResults.isEmpty {
+        title = "Number of Flashcards: \(onlineQuizes.count)"
+        setUpAlerts(title: "No Results", message: "No Flashcards were found!")
+      }else{
+        onlineQuizes = searchResults
+        title = "Number of Flashcards: \(onlineQuizes.count)"
+      }
+    }
+
+  }
   
 }

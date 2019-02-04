@@ -8,7 +8,7 @@
 
 import Foundation
 final class OnlineQuizHelper{
-  private static let filename = "OnlineQuiz.plist"
+  private static let filename = "TheOnlineQuiz.plist"
   private static var quizes = [Quizzes]()
   
   static func getQuizes() ->[Quizzes]{

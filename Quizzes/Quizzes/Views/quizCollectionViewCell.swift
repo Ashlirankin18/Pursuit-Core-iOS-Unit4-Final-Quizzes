@@ -51,11 +51,12 @@ class QuizCollectionViewCell: UICollectionViewCell {
  @objc private func presentOptions(){
   
   let alertController = UIAlertController(title: "Options", message: "What would like to do?", preferredStyle: .actionSheet)
-  
+  let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
   let deleteAction = UIAlertAction(title: "Delete", style: .destructive) { (delete) in
    self.delegate?.removeFlashCard(index: self.addButton.tag)
   }
   alertController.addAction(deleteAction)
+  alertController.addAction(cancelAction)
   delegate?.presentActionsheet(alertController: alertController)
   }
   

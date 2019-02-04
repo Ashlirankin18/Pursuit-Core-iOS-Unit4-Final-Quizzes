@@ -21,6 +21,13 @@ class SearchView: UIView {
     return collectionView
   }()
   
+  lazy var searchBar:UISearchBar = {
+    let theSearchBar = UISearchBar()
+    theSearchBar.backgroundColor = .white
+    theSearchBar.placeholder = "New search"
+    return theSearchBar
+  }()
+  
   override init(frame: CGRect) {
     super.init(frame: UIScreen.main.bounds)
     commonInit()
@@ -38,16 +45,26 @@ class SearchView: UIView {
 extension SearchView{
   
   private func setUpViews(){
+  setUpSearchBarConstraints()
   setUpCollectionViewConstraints()
   }
-  private func setUpCollectionViewConstraints(){
+  
+  private func setUpSearchBarConstraints(){
+    addSubview(searchBar)
+    searchBar.translatesAutoresizingMaskIntoConstraints = false
+    NSLayoutConstraint.init(item: searchBar, attribute: .top, relatedBy: .equal, toItem: safeAreaLayoutGuide, attribute: .top, multiplier: 1.0, constant: 0).isActive = true
+    NSLayoutConstraint.init(item: searchBar, attribute: .leading, relatedBy: .equal, toItem: safeAreaLayoutGuide, attribute: .leading, multiplier: 1.0, constant: 0).isActive = true
+    NSLayoutConstraint.init(item: searchBar, attribute: .trailing, relatedBy: .equal, toItem: safeAreaLayoutGuide, attribute: .trailing, multiplier: 1.0, constant: 0).isActive = true
+    
+  }
+ private func setUpCollectionViewConstraints(){
     addSubview(searchCollectionView)
     searchCollectionView.translatesAutoresizingMaskIntoConstraints = false
-    NSLayoutConstraint.init(item: searchCollectionView, attribute: .top, relatedBy: .equal, toItem: safeAreaLayoutGuide, attribute: .top, multiplier: 1.0, constant: 0).isActive = true
+    NSLayoutConstraint.init(item: searchCollectionView, attribute: .top, relatedBy: .equal, toItem: searchBar, attribute: .bottom, multiplier: 1.0, constant: 0).isActive = true
     NSLayoutConstraint.init(item: searchCollectionView, attribute: .bottom, relatedBy: .equal, toItem: safeAreaLayoutGuide
       , attribute: .bottom, multiplier: 1.0, constant: 0).isActive = true
     NSLayoutConstraint.init(item: searchCollectionView, attribute: .leading, relatedBy: .equal, toItem: safeAreaLayoutGuide, attribute: .leading, multiplier: 1.0, constant: 0).isActive = true
     NSLayoutConstraint.init(item: searchCollectionView, attribute: .trailing, relatedBy: .equal, toItem: safeAreaLayoutGuide, attribute: .trailing, multiplier: 1.0, constant: 0).isActive = true
-    
-  }
+
+ }
 }
